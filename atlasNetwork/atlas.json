@@ -1,0 +1,233 @@
+{
+    "ground-stations": {
+        "enterprise": [
+        {
+            "location": "Barrow, AK, USA",
+            "antenna_size": 3.7,
+            "latitude": 71.27,
+            "longitude": -156.81,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 12.8,
+                    "EIRP": 60.0
+                },
+                "x_band": {
+                    "rx_frequency_range": [7800, 8400],
+                    "G/T_db_K": 25.4
+                }
+            }
+        },
+        {
+            "location": "Dundee, Scotland",
+            "antenna_size": 3.7,
+            "latitude": 56.40,
+            "longitude": -3.18,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2400],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 13.6,
+                    "EIRP": 48.0
+                },
+                "x_band": {
+                    "rx_frequency_range": [7800, 8400],
+                    "G/T_db_K": 26.5
+                }
+            }
+        },
+        {
+            "location": "Chitose, Japan",
+            "antenna_size": 3.4,
+            "latitude": 42.77,
+            "longitude": 141.62,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+            "s_band": {
+                "rx_frequency_range": [2200, 2300],
+                "tx_frequency_range": [2025, 2120],
+                "G/T_db_K": 11.5,
+                "EIRP": 52.0
+            },
+            "x_band": {
+                "rx_frequency_range": [7900, 8500],
+                "G/T_db_K": 26.4
+            }
+            }
+        },
+        {
+            "location": "Mojave, CA, USA",
+            "antenna_size": 3.0,
+            "latitude": 35.05,
+            "longitude": -118.15,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+            "s_band": {
+                "rx_frequency_range": [2200, 2300],
+                "tx_frequency_range": [2025, 2110],
+                "G/T_db_K": 11.3,
+                "EIRP": 54.4
+            },
+            "x_band": {
+                "rx_frequency_range": [7900, 8500],
+                "G/T_db_K": 25.9
+            }
+            }
+        },
+        {
+            "location": "Dubai, UAE",
+            "antenna_size": 3.7,
+            "latitude": 24.94,
+            "longitude": 55.35,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 12.8,
+                    "EIRP": 50.0
+                },
+                "x_band": {
+                    "rx_frequency_range": [7900, 8400],
+                    "G/T_db_K": 25.4
+                }
+            }
+        },
+        {
+            "location": "Paumalu, Hawaii, USA",
+            "antenna_size": 7.3,
+            "latitude": 21.67,
+            "longitude": -158.03,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 20.7,
+                    "EIRP": 65.0
+                },
+                "x_band": {
+                    "rx_frequency_range": [7900, 8500],
+                    "G/T_db_K": 31.0
+                }
+            }
+        },
+        {
+            "location": "Harmon, Guam",
+            "antenna_size": 3.7,
+            "latitude": 13.51,
+            "longitude": 144.82,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+              "s_band": {
+                "rx_frequency_range": [2200, 2300],
+                "tx_frequency_range": [2025, 2110],
+                "G/T_db_K": 13.6,
+                "EIRP": 52.4
+              },
+              "x_band": {
+                "rx_frequency_range": [7900, 8400],
+                "G/T_db_K": 25.1
+              }
+            }
+          },
+          {
+            "location": "Sunyani, Ghana",
+            "antenna_size": 3.0,
+            "latitude": 7.34,
+            "longitude": -2.34,
+            "polarization": ["RHCP"],
+            "frequency": {
+              "s_band": {
+                "rx_frequency_range": [2200, 2300],
+                "tx_frequency_range": [2025, 2110],
+                "G/T_db_K": 12.4,
+                "EIRP": 50.1
+              }
+            }
+          },
+          {
+            "location": "Mwulire, Rwanda",
+            "antenna_size": 9.3,
+            "latitude": -1.96,
+            "longitude": 30.39,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+              "s_band": {
+                "rx_frequency_range": [2200, 2300],
+                "tx_frequency_range": [2025, 2120],
+                "G/T_db_K": 21.5,
+                "EIRP": 60
+              },
+              "x_band": {
+                "rx_frequency_range": [7900, 8500],
+                "G/T_db_K": 36.0
+              }
+            }
+          },
+          {
+            "location": "Tahiti, French Polynesia",
+            "antenna_size": 3.7,
+            "latitude": -17.63,
+            "longitude": -149.60,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+              "s_band": {
+                "rx_frequency_range": [2200, 2300],
+                "tx_frequency_range": [2025, 2110],
+                "G/T_db_K": 13.9,
+                "EIRP": 47.5
+              },
+              "x_band": {
+                "rx_frequency_range": [7900, 8400],
+                "G/T_db_K": 27.4
+              }
+            }
+          },
+          {
+            "location": "Awarua, New Zealand",
+            "antenna_size": 3.7,
+            "latitude": -46.52,
+            "longitude": 168.38,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+              "s_band": {
+                "rx_frequency_range": [2200, 2300],
+                "tx_frequency_range": [2025, 2120],
+                "G/T_db_K": 13.7,
+                "EIRP": 49.0
+              },
+              "x_band": {
+                "rx_frequency_range": [8025, 8500],
+                "G/T_db_K": 27.0
+              }
+            }
+          }
+        ],
+        "partner_stations": [
+          {
+            "location": "Sodankyl�, Finland",
+            "antenna_size": 7.3,
+            "latitude": 67.36,
+            "longitude": 26.63,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+              "s_band": {
+                "rx_frequency_range": [2200, 2300],
+                "tx_frequency_range": [2025, 2110],
+                "G/T_db_K": 19.8,
+                "EIRP": 54.8
+              },
+              "x_band": {
+                "rx_frequency_range": [7900, 8500]
+              }
+            }
+          }
+
+        ]
+    }
+  }
+  
