@@ -61,11 +61,12 @@ uplinkDataRate = 16 # Mbps
 downlinkDataRate = 16 # Mbps
 
 sat_tx = refueler_sat.Children.New(AgESTKObjectType.eTransmitter, 'SatTransmitter')
-sat_tx.SetModel('Complex Transmitter Model')
+sat_tx.SetModel('Medium Transmitter Model')
 sat_tx_model = sat_tx.Model
 sat_tx_model.Frequency = sat_tx_freq/1000
 sat_tx_model.DataRate = downlinkDataRate
-sat_tx_model.Power = 0.1 # dBW
+sat_tx_model.Power = 1 # dBW
+sat_tx_model.AntennaGain = 20 # dB
 
 sat_rx = refueler_sat.Children.New(AgESTKObjectType.eReceiver, 'SatReceiver')
 sat_rx.SetModel('Simple Receiver Model')
@@ -117,6 +118,12 @@ for i, station in enumerate(data['ground-stations']['enterprise']):
     gnd_rx.SetModel('Simple Receiver Model')
     gnd_rx_model = gnd_rx.Model
     gnd_rx_model.GOverT = station['frequency']['s_band']['G/T_db_K']
+
+    linkAccess = refueler_sat.GetAccessToObject(ground_stations[i])
+    linkAccess.ComputeAccess()
+
+    accessIntervals = linkAccess.ComputedAccessIntervalTimes
+    #print("\t\tAccess Intervals: ", accessIntervals.Time)
 
 
 
