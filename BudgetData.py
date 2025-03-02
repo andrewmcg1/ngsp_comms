@@ -180,6 +180,19 @@ for gain in GAINS:
                 else:
                     interval[i] = round(time)
 
+        for i, value in enumerate(time_values):
+            for j, x in enumerate(value):
+                if x not in downlink[0]:
+                    index = bisect.bisect_left(downlink[0], x)
+                    downlink[0].insert(index, x)
+                    downlink[1].insert(index, ebno[i][j])
+                    downlink[2].insert(index, ber[i][j])
+                else:
+                    index = downlink[0].index(x)
+                    if ebno[i][j] > downlink[1][index]:
+                        downlink[1][index] = ebno[i][j]
+                        downlink[2][index] = ber[i][j]
+
         
         res_time, res_ebno, res_ber = [[]], [[]], [[]]
         last = None
@@ -198,19 +211,6 @@ for gain in GAINS:
         downlink[2] = res_ber
 
         print(downlink)
-
-        for i, value in enumerate(time_values):
-            for j, x in enumerate(value):
-                if x not in downlink[0]:
-                    index = bisect.bisect_left(downlink[0], x)
-                    downlink[0].insert(index, x)
-                    downlink[1].insert(index, ebno[i][j])
-                    downlink[2].insert(index, ber[i][j])
-                else:
-                    index = downlink[0].index(x)
-                    if ebno[i][j] > downlink[1][index]:
-                        downlink[1][index] = ebno[i][j]
-                        downlink[2][index] = ber[i][j]
 
         plt.figure(1)
         plt.title("Downlink Eb/No")
