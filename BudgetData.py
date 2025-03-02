@@ -174,33 +174,6 @@ for i, station in enumerate(data['ground-stations']['enterprise']):
                 if ebno[i][j] > downlink[1][index]:
                     downlink[1][index] = ebno[i][j]
                     downlink[2][index] = ber[i][j]
-            #if index == 0:
-            #    if downlink[0] == []:
-            #        print(x)
-            #        downlink[0].insert(index, x)
-            #        downlink[1].insert(index, ebno[i][j])
-            #        downlink[2].insert(index, ber[i][j])
-            #    elif ebno[i][j] > downlink[1][index]:
-            #        downlink[0][index] = x
-            #        downlink[1][index] = ebno[i][j]
-            #        downlink[2][index] = ber[i][j]
-            ##else:
-            ##    downlink[0].insert(index, x)
-            ##    downlink[1].insert(index, ebno[i][j])
-            ##    downlink[2].insert(index, ber[i][j])
-            #elif downlink[0][-1] > x:
-            #    if (ebno[i][j] > downlink[1][index-1]) and (index+1 < len(downlink[1]) and ebno[i][j] > downlink[1][index-1]):
-            #        downlink[0].insert(index, x)
-            #        downlink[1].insert(index, ebno[i][j])
-            #        downlink[2].insert(index, ber[i][j])
-            #    else:
-            #        downlink[0].insert(index, x)
-            #        downlink[1].insert(index, ebno[i][j])
-            #        downlink[2].insert(index, ber[i][j])
-            #else:
-            #    downlink[0].insert(index, x)
-            #    downlink[1].insert(index, ebno[i][j])
-            #    downlink[2].insert(index, ber[i][j])
 
 
 res_time, res_ebno, res_ber = [[]], [[]], [[]]
