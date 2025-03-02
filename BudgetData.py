@@ -8,7 +8,9 @@ import json
 import matplotlib.pyplot as plt
 import bisect
 import math
-from numpy import linspace
+from numpy import linspace, array
+from pathlib import Path
+import threading
 
 network_json = "atlasNetwork/atlas.json"
 DOWNLINK_BER_THRESHOLD = 1e-15
@@ -17,8 +19,8 @@ sat_tx_freq = 2120
 uplinkDataRate = 16 # Mbps
 downlinkDataRate = 16 # Mbps
 
-GAINS = [15] #linspace(0, 30, 11)
-POWERS = [0] #linspace(-16, 20, 11)
+GAINS = linspace(0, 30, 31)
+POWERS = linspace(-16, 20, 37)
 
 stk = STKEngine.StartApplication(noGraphics=False)
 root = stk.NewObjectRoot()
@@ -114,9 +116,11 @@ for i, station in enumerate(data['ground-stations']['enterprise']):
     gnd_rx_model.GOverT = station['frequency']['s_band']['G/T_db_K']
 
 
-
+time_connected = []
 for gain in GAINS:
+    time_connected_inner = []
     for power in POWERS:
+        Path(network_json.split("/")[0] + "/downlink/gain_" + str(gain) + "/power_" + str(power)).mkdir(parents=True, exist_ok=True)
 
         #print("Preparing Satellite...")
         
@@ -165,33 +169,27 @@ for gain in GAINS:
             
             #downlink.append([time_values, ebno, ber])
 
-        for i in range(len(accessIntervals)):
-            plt.figure(1)
-            plt.plot(time_values[i], ebno[i])
-            plt.figure(2)
-            plt.plot(time_values[i], ber[i])
+            for interval in time_values:
+                for i, time in enumerate(interval):
+                    if time == interval[-1]:
+                        interval[i] = math.ceil(time)
+                    elif time == interval[0]:
+                        interval[i] = math.floor(time)
+                    else:
+                        interval[i] = round(time)
 
-        for interval in time_values:
-            for i, time in enumerate(interval):
-                if time == interval[-1]:
-                    interval[i] = math.ceil(time)
-                elif time == interval[0]:
-                    interval[i] = math.floor(time)
-                else:
-                    interval[i] = round(time)
-
-        for i, value in enumerate(time_values):
-            for j, x in enumerate(value):
-                if x not in downlink[0]:
-                    index = bisect.bisect_left(downlink[0], x)
-                    downlink[0].insert(index, x)
-                    downlink[1].insert(index, ebno[i][j])
-                    downlink[2].insert(index, ber[i][j])
-                else:
-                    index = downlink[0].index(x)
-                    if ebno[i][j] > downlink[1][index]:
-                        downlink[1][index] = ebno[i][j]
-                        downlink[2][index] = ber[i][j]
+            for i, value in enumerate(time_values):
+                for j, x in enumerate(value):
+                    if x not in downlink[0]:
+                        index = bisect.bisect_left(downlink[0], x)
+                        downlink[0].insert(index, x)
+                        downlink[1].insert(index, ebno[i][j])
+                        downlink[2].insert(index, ber[i][j])
+                    else:
+                        index = downlink[0].index(x)
+                        if ebno[i][j] > downlink[1][index]:
+                            downlink[1][index] = ebno[i][j]
+                            downlink[2][index] = ber[i][j]
 
         
         res_time, res_ebno, res_ber = [[]], [[]], [[]]
@@ -209,8 +207,6 @@ for gain in GAINS:
         downlink[0] = res_time
         downlink[1] = res_ebno
         downlink[2] = res_ber
-
-        print(downlink)
 
         plt.figure(1)
         plt.title("Downlink Eb/No")
@@ -231,18 +227,35 @@ for gain in GAINS:
         percentConnected = totalTime / (24*60*60)
         print("\tConnected Time:", totalTime, "seconds")
         print("\tConnected Time:", percentConnected*100, "%")
+        time_connected_inner.append(percentConnected)
 
 
-        plt.figure(3)
+        plt.figure(1)
         for i, _ in enumerate(downlink[0]):
             plt.plot(downlink[0][i], downlink[1][i])
+        plt.gcf().savefig(network_json.split("/")[0] + "/downlink/gain_" + str(gain) + "/power_" + str(power) + "/ebno.pdf")
+        plt.clf()
         
-        plt.figure(4)
+        plt.figure(2)
         for i, _ in enumerate(downlink[0]): 
-            plt.plot(downlink[0][i], downlink[2][i])
-        
-        
-        plt.show()
+            plt.semilogy(downlink[0][i], downlink[2][i])
+        plt.gcf().savefig(network_json.split("/")[0] + "/downlink/gain_" + str(gain) + "/power_" + str(power) + "/ber.pdf")
+        plt.clf()
+
+        #plt.show()
+    time_connected.append(time_connected_inner)
+time_connected = array(time_connected)
+
+plt.figure(1)
+plt.close()
+plt.figure(2)
+plt.close()
+
+plt.figure(3)
+plt.title("Connected Time")
+plt.imshow(time_connected, cmap='RdBu', interpolation='nearest')
+plt.colorbar()
+plt.show()
 
 print("Saving...")
 root.Save()
