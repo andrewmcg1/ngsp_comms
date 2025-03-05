@@ -12,6 +12,7 @@ from numpy import linspace, array
 from pathlib import Path
 import multiprocessing
 from tqdm.contrib.concurrent import process_map
+import tqdm
 
 network_json = "atlasNetwork/atlas.json"
 DOWNLINK_BER_THRESHOLD = 1e-15
@@ -20,13 +21,16 @@ sat_tx_freq = 2120
 uplinkDataRate = 16 # Mbps
 downlinkDataRate = 16 # Mbps
 
-GAINS = #linspace(0, 30, 31)
-POWERS = #linspace(-16, 20, 37)
+GAINS = [1, 10]#linspace(0, 30, 31)
+POWERS = [1]#linspace(-16, 20, 37)
 
 
-def link_budget_threaded(network_json, gain_list, power_list, q=None, lock=None):
+def link_budget_threaded(inputList):
     #with lock:
-
+    ################
+    network_json = inputList[0]
+    gain_list = [inputList[1]]
+    power_list = [inputList[2]]
     stk = STKEngine.StartApplication(noGraphics=False)
     root = stk.NewObjectRoot()
 
@@ -251,20 +255,25 @@ def link_budget_threaded(network_json, gain_list, power_list, q=None, lock=None)
         time_connected.append(time_connected_inner)
     time_connected = array(time_connected)
         #q.put(time_connected)
+    root.CloseScenario()
     return time_connected
 
 if __name__ == '__main__':
-    #q = multiprocessing.Queue()
-    #lock = multiprocessing.Lock()
+    q = multiprocessing.Queue()
+    lock = multiprocessing.Lock()
 #
     #p1 = multiprocessing.Process(target=link_budget_threaded, args=(network_json, GAINS, POWERS, q, lock))
     #p1.start()
 #
     #p1.join()
 #
-    #time_connected = q.get()
-
-    time_connected = process_map(link_budget_threaded, [network_json], [GAINS], [POWERS], max_workers=2)
+    time_connected = q.get()
+##################################
+     time_connected = process_map(link_budget_threaded, [network_json], [GAINS], [POWERS], max_workers=2)
+    ##################################
+    #inputList = zip([network_json]*len(GAINS)*len(POWERS), GAINS*len(POWERS), POWERS*len(GAINS))
+    #with multiprocessing.Pool(1) as p:
+    #    time_connected = list(tqdm.tqdm(p.imap(link_budget_threaded, inputList), total=len(GAINS)*len(POWERS)))
 
     plt.figure(1)
     plt.close()
