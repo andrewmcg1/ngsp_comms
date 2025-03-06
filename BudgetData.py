@@ -12,6 +12,7 @@ from numpy import linspace, array
 from pathlib import Path
 import multiprocessing
 from tqdm.contrib.concurrent import process_map
+from tqdm import tqdm
 
 network_json = "atlasNetwork/atlas.json"
 DOWNLINK_BER_THRESHOLD = 1e-15
@@ -20,8 +21,8 @@ sat_tx_freq = 2120
 uplinkDataRate = 16 # Mbps
 downlinkDataRate = 16 # Mbps
 
-GAINS = #linspace(0, 30, 31)
-POWERS = #linspace(-16, 20, 37)
+GAINS = linspace(0, 30, 31)
+POWERS = linspace(-16, 20, 37)
 
 
 def link_budget_threaded(network_json, gain_list, power_list, q=None, lock=None):
@@ -122,9 +123,9 @@ def link_budget_threaded(network_json, gain_list, power_list, q=None, lock=None)
 
 
     time_connected = []
-    for gain in gain_list:
+    for gain in tqdm(gain_list, desc="Gain"):
         time_connected_inner = []
-        for power in power_list:
+        for power in tqdm(power_list, desc="Power", leave=False):
             Path(network_json.split("/")[0] + "/downlink/gain_" + str(gain) + "/power_" + str(power)).mkdir(parents=True, exist_ok=True)
 
             #print("Preparing Satellite...")
@@ -264,7 +265,9 @@ if __name__ == '__main__':
 #
     #time_connected = q.get()
 
-    time_connected = process_map(link_budget_threaded, [network_json], [GAINS], [POWERS], max_workers=2)
+    #time_connected = process_map(link_budget_threaded, [network_json], [GAINS], [POWERS], max_workers=1)
+
+    time_connected = link_budget_threaded(network_json, GAINS, POWERS)
 
     plt.figure(1)
     plt.close()
@@ -273,8 +276,16 @@ if __name__ == '__main__':
 
     plt.figure(3)
     plt.title("Connected Time")
-    plt.imshow(time_connected, cmap='RdBu', interpolation='nearest')
-    plt.colorbar()
+    plt.ylabel("Gain (dB)")
+    plt.xlabel("Power (dBW)")
+    plt.ylim(GAINS[0], GAINS[-1])
+    plt.xlim(POWERS[0], POWERS[-1])
+    plt.yticks(GAINS)
+    plt.xticks(POWERS)
+    plt.imshow(time_connected, cmap='RdBu', interpolation='nearest', origin='upper', extent=[POWERS[0], POWERS[-1], GAINS[0], GAINS[-1]])
+    cbar = plt.colorbar()
+    cbar.set_label("Time Connected to Atlas Network (%)")
+    plt.gcf().savefig('/'.join(network_json.split("/")[:-1]) + "/power_gain.pdf")
     plt.show()
 
 
