@@ -5,6 +5,7 @@ from agi.stk12.stkutil import *
 from agi.stk12.vgt import *
 
 import json
+from colorama import init
 import matplotlib.pyplot as plt
 import bisect
 import math
@@ -21,16 +22,23 @@ sat_tx_freq = 2120
 uplinkDataRate = 16 # Mbps
 downlinkDataRate = 16 # Mbps
 
-GAINS = [1, 10]#linspace(0, 30, 31)
-POWERS = [1]#linspace(-16, 20, 37)
+GAINS = [1, 10, 20]#linspace(0, 30, 31)
+POWERS = [1, 2, 3]#linspace(-16, 20, 37)
+
+class helpa:
+    def __init__(self):
+        self.stk = STKEngine.StartApplication(noGraphics=False)
+        self.root = self.stk.NewObjectRoot()
 
 
-def link_budget_threaded(inputList):
+
+
+def link_budget_threaded(network_json, gain_list, power_list):#inputList):
     #with lock:
     ################
-    network_json = inputList[0]
-    gain_list = [inputList[1]]
-    power_list = [inputList[2]]
+    #network_json = inputList[0]
+    #gain_list = [inputList[1]]
+    #power_list = [inputList[2]]
     stk = STKEngine.StartApplication(noGraphics=False)
     root = stk.NewObjectRoot()
 
@@ -267,9 +275,9 @@ if __name__ == '__main__':
 #
     #p1.join()
 #
-    time_connected = q.get()
+#    time_connected = q.get()
 ##################################
-     time_connected = process_map(link_budget_threaded, [network_json], [GAINS], [POWERS], max_workers=2)
+    time_connected = process_map(link_budget_threaded, [network_json], [GAINS], [POWERS], max_workers=2)
     ##################################
     #inputList = zip([network_json]*len(GAINS)*len(POWERS), GAINS*len(POWERS), POWERS*len(GAINS))
     #with multiprocessing.Pool(1) as p:
