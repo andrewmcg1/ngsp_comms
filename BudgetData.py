@@ -27,8 +27,7 @@ def chunks(l, n):
         yield l[si:si+(d+1 if i < r else d)]
 
 def link_budget_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_tx_freq, gain_list, power_list):
-    #with lock:
-
+  
     stk = STKEngine.StartApplication(noGraphics=False)
     root = stk.NewObjectRoot()
 
@@ -282,6 +281,7 @@ if __name__ == '__main__':
 
     reverse_sorted = [z for y in sorted(time_connected_unsorted, key=lambda x: x[0][0]) for z in y[1]]
     time_connected = array(reverse_sorted[::-1])
+
 
     plt.figure(1)
     plt.close()
