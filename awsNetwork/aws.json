@@ -1,0 +1,233 @@
+{
+    "ground-stations": 
+    [
+        {
+            "location": "Alaska, USA",
+            "antenna_size": 0,
+            "latitude": 70.20,
+            "longitude": -148.46,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Bahrain",
+            "antenna_size": 0,
+            "latitude": 26.05,
+            "longitude": 50.49,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Cape Town, South Africa",
+            "antenna_size": 0,
+            "latitude": -33.92,
+            "longitude": 18.42,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Dubbo, Australia",
+            "antenna_size": 0,
+            "latitude": -32.24,
+            "longitude": 148.61,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Hawaii, USA",
+            "antenna_size": 0,
+            "latitude": 21.33,
+            "longitude": -158.08,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Ireland",
+            "antenna_size": 0,
+            "latitude": 53.35,
+            "longitude": -6.26,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Ohio, USA",
+            "antenna_size": 0,
+            "latitude": 39.96,
+            "longitude": -83.0,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Oregon, USA",
+            "antenna_size": 0,
+            "latitude": 45.52,
+            "longitude": -122.68,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Punta Arenas, Chile",
+            "antenna_size": 0,
+            "latitude": -53.16,
+            "longitude": -70.91,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Seoul, South Korea",
+            "antenna_size": 0,
+            "latitude": 37.55,
+            "longitude": 127.0,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Singapore",
+            "antenna_size": 0,
+            "latitude": 1.35,
+            "longitude": 103.82,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        },
+        {
+            "location": "Stockholm, Sweden",
+            "antenna_size": 0,
+            "latitude": 59.33,
+            "longitude": 18.07,
+            "polarization": ["RHCP", "LHCP"],
+            "frequency": {
+                "s_band": {
+                    "rx_frequency_range": [2200, 2300],
+                    "tx_frequency_range": [2025, 2120],
+                    "G/T_db_K": 16,
+                    "EIRP": 53
+                },
+                "x_band": {
+                    "rx_frequency_range": [7750, 8400],
+                    "G/T_db_K": 30.5
+                }
+            }
+        }
+    ]
+}
