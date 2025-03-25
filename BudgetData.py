@@ -130,6 +130,7 @@ def link_budget_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_tx_
 
 
     downlink_time_connected = []
+    costs = []
     for gain in tqdm(gain_list, desc="Gain"):
         downlink_time_connected_inner = []
         for power in tqdm(power_list, desc="Power", leave=False):
@@ -182,7 +183,19 @@ def link_budget_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_tx_
                 
                 #downlink.append([time_values, ebno, ber])
 
+                contactsPerDay = len(downlink_time_values)
                 for interval in downlink_time_values:
+
+                    contactMin = interval[-1] - interval[0]
+                    contactHours = contactMin / 60
+
+                    apertureWeight = 1 # 1 for 34m station
+                    baseRate = 1400 # dollars
+
+                    contactCost = (contactHours + 1)*baseRate*apertureWeight*(0.9/7  + contactsPerDay)
+
+                    costs.append(contactCost)
+
                     for i, time in enumerate(interval):
                         if time == interval[-1]:
                             interval[i] = math.ceil(time)
@@ -257,7 +270,7 @@ def link_budget_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_tx_
             #plt.show()
 
         downlink_time_connected.append(downlink_time_connected_inner)
-    return gain_list, downlink_time_connected
+    return gain_list, downlink_time_connected, costs
 
 if __name__ == '__main__':
 
