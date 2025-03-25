@@ -18,6 +18,7 @@ from tqdm.contrib.concurrent import process_map
 from tqdm import tqdm
 
 DOWNLINK_BER_THRESHOLD = 1e-15
+# +12dB SNR for strong connection uplink (from NASA)
 
 def chunks(l, n):
     """Yield n number of sequential chunks from l."""
