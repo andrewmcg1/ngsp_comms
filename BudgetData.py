@@ -275,23 +275,6 @@ def link_budget_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_tx_
     return gain_list, downlink_time_connected, costs
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-    q = multiprocessing.Queue()
-    lock = multiprocessing.Lock()
-#
-    #p1 = multiprocessing.Process(target=link_budget_threaded, args=(network_json, GAINS, POWERS, q, lock))
-    #p1.start()
-#
-    #p1.join()
-#
-#    time_connected = q.get()
-##################################
-    time_connected = process_map(link_budget_threaded, [network_json], [GAINS], [POWERS], max_workers=2)
-    ##################################
-    #inputList = zip([network_json]*len(GAINS)*len(POWERS), GAINS*len(POWERS), POWERS*len(GAINS))
-    #with multiprocessing.Pool(1) as p:
-    #    time_connected = list(tqdm.tqdm(p.imap(link_budget_threaded, inputList), total=len(GAINS)*len(POWERS)))
-=======
 
         
     network_json = "awsNetwork/aws.json"
@@ -322,7 +305,6 @@ if __name__ == '__main__':
     downlink_reverse_sorted = [z for y in sorted(time_connected_unsorted, key=lambda x: x[0][0]) for z in y[1]]
     downlink_time_connected = array(downlink_reverse_sorted[::-1])
 
->>>>>>> a266035a25ab2dae6493520d7fba23320ab310a9
 
     plt.figure(1)
     plt.close()
