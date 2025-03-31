@@ -1,3 +1,6 @@
+from multiprocessing import process
+from os import error
+import time
 from agi.stk12.stkengine import *
 from agi.stk12.stkdesktop import STKDesktop
 from agi.stk12.stkobjects import *
@@ -13,32 +16,20 @@ from numpy import linspace, array
 from pathlib import Path
 import multiprocessing
 from tqdm.contrib.concurrent import process_map
-import tqdm
+from tqdm import tqdm
 
-network_json = "atlasNetwork/atlas.json"
 DOWNLINK_BER_THRESHOLD = 1e-15
+# +12dB SNR for strong connection uplink (from NASA)
 
-sat_tx_freq = 2120
-uplinkDataRate = 16 # Mbps
-downlinkDataRate = 16 # Mbps
+def chunks(l, n):
+    """Yield n number of sequential chunks from l."""
+    d, r = divmod(len(l), n)
+    for i in range(n):
+        si = (d+1)*(i if i < r else r) + d*(0 if i < r else i - r)
+        yield l[si:si+(d+1 if i < r else d)]
 
-GAINS = [1, 10, 20]#linspace(0, 30, 31)
-POWERS = [1, 2, 3]#linspace(-16, 20, 37)
-
-class helpa:
-    def __init__(self):
-        self.stk = STKEngine.StartApplication(noGraphics=False)
-        self.root = self.stk.NewObjectRoot()
-
-
-
-
-def link_budget_threaded(network_json, gain_list, power_list):#inputList):
-    #with lock:
-    ################
-    #network_json = inputList[0]
-    #gain_list = [inputList[1]]
-    #power_list = [inputList[2]]
+def link_budget_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_tx_freq, gain_list, power_list):
+  
     stk = STKEngine.StartApplication(noGraphics=False)
     root = stk.NewObjectRoot()
 
@@ -50,7 +41,7 @@ def link_budget_threaded(network_json, gain_list, power_list):#inputList):
     root.NewScenario('NGSP_Link_Budget')
 
     root.UnitPreferences.SetCurrentUnit("Distance", "km")
-    root.UnitPreferences.SetCurrentUnit("Time", "sec")
+    root.UnitPreferences.SetCurrentUnit("Time", "min")
     root.UnitPreferences.SetCurrentUnit("Angle", "deg")
     root.UnitPreferences.SetCurrentUnit("Latitude", "deg")
     root.UnitPreferences.SetCurrentUnit("Longitude", "deg")
@@ -58,7 +49,7 @@ def link_budget_threaded(network_json, gain_list, power_list):#inputList):
     root.UnitPreferences.SetCurrentUnit("Duration", "sec")
 
     root.CurrentScenario.SetTimePeriod("21 Feb 2025 00:00:00", "22 Feb 2025 00:00:00")
-    root.UnitPreferences.SetCurrentUnit("DateFormat", "EpSec")
+    root.UnitPreferences.SetCurrentUnit("DateFormat", "EpMin")
 
 
     # satellite setup
@@ -93,8 +84,9 @@ def link_budget_threaded(network_json, gain_list, power_list):#inputList):
         data = json.load(f)
 
     ground_stations = []
+    band = 's_band'
 
-    for i, station in enumerate(data['ground-stations']['enterprise']):
+    for i, station in enumerate(data['ground-stations']):
         name = station['location'].replace(", ", "_").replace(" ", "_")
         lat = station['latitude']
         lon = station['longitude']
@@ -104,7 +96,10 @@ def link_budget_threaded(network_json, gain_list, power_list):#inputList):
         tx_frequency_range = station['frequency']['s_band']['tx_frequency_range']
         tx_frequency = (sum(tx_frequency_range) / len(tx_frequency_range))
 
-        rx_frequency_range = station['frequency']['s_band']['rx_frequency_range']
+        try:
+            rx_frequency_range = station['frequency'][band]['rx_frequency_range']
+        except:
+            rx_frequency_range = station['frequency']['s_band']['rx_frequency_range']
         rx_frequency = (sum(rx_frequency_range) / len(rx_frequency_range))
 
         # ground station setup
@@ -130,13 +125,17 @@ def link_budget_threaded(network_json, gain_list, power_list):#inputList):
         gnd_rx = servo.Children.New(AgESTKObjectType.eReceiver, 'GndReceiver')
         gnd_rx.SetModel('Simple Receiver Model')
         gnd_rx_model = gnd_rx.Model
-        gnd_rx_model.GOverT = station['frequency']['s_band']['G/T_db_K']
+        try:
+            gnd_rx_model.GOverT = station['frequency'][band]['G/T_db_K']
+        except:
+            gnd_rx_model.GOverT = station['frequency']['s_band']['G/T_db_K']
 
 
-    time_connected = []
-    for gain in gain_list:
-        time_connected_inner = []
-        for power in power_list:
+    downlink_time_connected = []
+    costs = []
+    for gain in tqdm(gain_list, desc="Gain"):
+        downlink_time_connected_inner = []
+        for power in tqdm(power_list, desc="Power", leave=False):
             Path(network_json.split("/")[0] + "/downlink/gain_" + str(gain) + "/power_" + str(power)).mkdir(parents=True, exist_ok=True)
 
             #print("Preparing Satellite...")
@@ -170,23 +169,35 @@ def link_budget_threaded(network_json, gain_list, power_list):#inputList):
                 downlinkAccess = sat_tx.GetAccessToObject(gnd_rx)
                 downlinkAccess.ComputeAccess()
 
-                accessIntervals = downlinkAccess.ComputedAccessIntervalTimes.ToArray(0, -1)
-                data_provider = downlinkAccess.DataProviders.Item("Link Information")
+                downlink_accessIntervals = downlinkAccess.ComputedAccessIntervalTimes.ToArray(0, -1)
+                downlink_data_provider = downlinkAccess.DataProviders.Item("Link Information")
 
                 link_budget_values = [["Time"], ["Eb/No"], ["BER"]]
-                time_values = []
-                ebno = []
-                ber = []
+                downlink_time_values = []
+                downlink_ebno = []
+                downlink_ber = []
 
-                for interval in accessIntervals:
-                    data = data_provider.ExecElements(interval[0], interval[1], 1, link_budget_values)
-                    time_values.append(data.DataSets[0].GetValues())
-                    ebno.append(data.DataSets[1].GetValues())
-                    ber.append(data.DataSets[2].GetValues())
+                for interval in downlink_accessIntervals:
+                    data = downlink_data_provider.ExecElements(interval[0], interval[1], 1, link_budget_values)
+                    downlink_time_values.append(data.DataSets[0].GetValues())
+                    downlink_ebno.append(data.DataSets[1].GetValues())
+                    downlink_ber.append(data.DataSets[2].GetValues())
                 
                 #downlink.append([time_values, ebno, ber])
 
-                for interval in time_values:
+                contactsPerDay = len(downlink_time_values)
+                for interval in downlink_time_values:
+
+                    contactMin = interval[-1] - interval[0]
+                    contactHours = contactMin / 60
+
+                    apertureWeight = 1 # 1 for 34m station
+                    baseRate = 1400 # dollars
+
+                    contactCost = (contactHours + 1)*baseRate*apertureWeight*(0.9/7  + contactsPerDay)
+
+                    costs.append(contactCost)
+
                     for i, time in enumerate(interval):
                         if time == interval[-1]:
                             interval[i] = math.ceil(time)
@@ -195,20 +206,19 @@ def link_budget_threaded(network_json, gain_list, power_list):#inputList):
                         else:
                             interval[i] = round(time)
 
-                for i, value in enumerate(time_values):
+                for i, value in enumerate(downlink_time_values):
                     for j, x in enumerate(value):
                         if x not in downlink[0]:
                             index = bisect.bisect_left(downlink[0], x)
                             downlink[0].insert(index, x)
-                            downlink[1].insert(index, ebno[i][j])
-                            downlink[2].insert(index, ber[i][j])
+                            downlink[1].insert(index, downlink_ebno[i][j])
+                            downlink[2].insert(index, downlink_ber[i][j])
                         else:
                             index = downlink[0].index(x)
-                            if ebno[i][j] > downlink[1][index]:
-                                downlink[1][index] = ebno[i][j]
-                                downlink[2][index] = ber[i][j]
+                            if downlink_ebno[i][j] > downlink[1][index]:
+                                downlink[1][index] = downlink_ebno[i][j]
+                                downlink[2][index] = downlink_ber[i][j]
 
-            
             res_time, res_ebno, res_ber = [[]], [[]], [[]]
             last = None
             for i, x in enumerate(downlink[0]):
@@ -241,32 +251,31 @@ def link_budget_threaded(network_json, gain_list, power_list):#inputList):
                     if float(downlink[2][j][i]) <= DOWNLINK_BER_THRESHOLD:
                         totalTime += 1
 
-            percentConnected = totalTime / (24*60*60)
+            percentConnected = totalTime / (24*60)
             #print("\tConnected Time:", totalTime, "seconds")
             #print("\tConnected Time:", percentConnected*100, "%")
-            time_connected_inner.append(percentConnected)
+            downlink_time_connected_inner.append(percentConnected)
 
 
             plt.figure(1)
             for i, _ in enumerate(downlink[0]):
                 plt.plot(downlink[0][i], downlink[1][i])
-            plt.gcf().savefig(network_json.split("/")[0] + "/downlink/gain_" + str(gain) + "/power_" + str(power) + "/ebno.pdf")
+            plt.gcf().savefig(network_json.split("/")[0] + "/downlink/gain_" + str(gain) + "/power_" + str(power) + "/" + band + "_ebno.pdf")
             plt.clf()
             
             plt.figure(2)
             for i, _ in enumerate(downlink[0]): 
                 plt.semilogy(downlink[0][i], downlink[2][i])
-            plt.gcf().savefig(network_json.split("/")[0] + "/downlink/gain_" + str(gain) + "/power_" + str(power) + "/ber.pdf")
+            plt.gcf().savefig(network_json.split("/")[0] + "/downlink/gain_" + str(gain) + "/power_" + str(power) + "/" + band + "_ber.pdf")
             plt.clf()
 
             #plt.show()
-        time_connected.append(time_connected_inner)
-    time_connected = array(time_connected)
-        #q.put(time_connected)
-    root.CloseScenario()
-    return time_connected
+
+        downlink_time_connected.append(downlink_time_connected_inner)
+    return gain_list, downlink_time_connected, costs
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     q = multiprocessing.Queue()
     lock = multiprocessing.Lock()
 #
@@ -282,6 +291,38 @@ if __name__ == '__main__':
     #inputList = zip([network_json]*len(GAINS)*len(POWERS), GAINS*len(POWERS), POWERS*len(GAINS))
     #with multiprocessing.Pool(1) as p:
     #    time_connected = list(tqdm.tqdm(p.imap(link_budget_threaded, inputList), total=len(GAINS)*len(POWERS)))
+=======
+
+        
+    network_json = "awsNetwork/aws.json"
+    network_json = "atlasNetwork/atlas.json"
+
+    sat_tx_freq = 2120
+    uplinkDataRate = 16 # Mbps
+    downlinkDataRate = 16 # Mbps
+
+    GAINS = linspace(0, 30, 31)
+    POWERS = linspace(-16, 20, 37)
+
+    p = []
+
+    num_workers = 11
+
+    if num_workers > len(GAINS):
+        raise ValueError("Number of workers must be less than or equal to the number of gains.")
+
+    split_gains = []
+    for gains in chunks(GAINS,num_workers):
+        split_gains.append(gains)
+
+    pool = multiprocessing.Pool(processes=num_workers)
+
+    time_connected_unsorted = pool.starmap(link_budget_threaded, [(network_json, uplinkDataRate, downlinkDataRate, sat_tx_freq, gains, POWERS) for gains in split_gains])
+
+    downlink_reverse_sorted = [z for y in sorted(time_connected_unsorted, key=lambda x: x[0][0]) for z in y[1]]
+    downlink_time_connected = array(downlink_reverse_sorted[::-1])
+
+>>>>>>> a266035a25ab2dae6493520d7fba23320ab310a9
 
     plt.figure(1)
     plt.close()
@@ -289,10 +330,20 @@ if __name__ == '__main__':
     plt.close()
 
     plt.figure(3)
-    plt.title("Connected Time")
-    plt.imshow(time_connected, cmap='RdBu', interpolation='nearest')
-    plt.colorbar()
+    plt.title("S-Band Atlas Connection Time")
+    plt.ylabel("Gain (dB)")
+    plt.xlabel("Power (dBW)")
+    plt.ylim(GAINS[0], GAINS[-1])
+    plt.xlim(POWERS[0], POWERS[-1])
+    plt.yticks(GAINS[::2], fontsize = 7)
+    plt.xticks(POWERS[::2], fontsize = 7)
+    plt.imshow(downlink_time_connected, cmap='viridis_r', interpolation='nearest', origin='upper', vmin=0, vmax=1, extent=[POWERS[0], POWERS[-1], GAINS[0], GAINS[-1]])
+    cbar = plt.colorbar()
+    cbar.set_label("Downlink Time Connected (%)")
+    plt.gcf().set_size_inches(9, 6)
+    plt.gcf().savefig('/'.join(network_json.split("/")[:-1]) + "/s_band_downlink_power_gain.pdf")
     plt.show()
+
 
 
 
