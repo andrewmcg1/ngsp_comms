@@ -123,9 +123,7 @@ def downlink_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_tx_fre
         gnd_rx.SetModel('Simple Receiver Model')
         gnd_rx_model = gnd_rx.Model
         gnd_rx_model.AutoTrackFrequency = False
-        root.Save()
-        return
-        #gnd_rx_model.Frequency = rx_frequency/1000
+        gnd_rx_model.Frequency = rx_frequency/1000
         gnd_rx_model.AutoTrackFrequency = True
         gnd_rx_model.EnablePolarization = True
         gnd_rx_model.UseRain = True
@@ -217,7 +215,7 @@ def downlink_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_tx_fre
                             if downlink_ebno[i][j] > downlink[1][index]:
                                 downlink[1][index] = downlink_ebno[i][j]
                                 downlink[2][index] = downlink_ber[i][j]
-            root.Save()
+            #root.Save()
             costs.append(costPerDay)
             res_time, res_ebno, res_ber = [[]], [[]], [[]]
             last = None
@@ -251,7 +249,7 @@ def downlink_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_tx_fre
                     if float(downlink[2][j][i]) <= DOWNLINK_BER_THRESHOLD:
                         totalTime += 1
 
-            percentConnected = totalTime / (24*60)
+            percentConnected = totalTime / (24*60) * 100
             #print("\tConnected Time:", totalTime, "seconds")
             #print("\tConnected Time:", percentConnected*100, "%")
             downlink_time_connected_inner.append(percentConnected)
@@ -497,7 +495,7 @@ def uplink_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_rx_freq,
                     if float(uplink[2][j][i]) <= UPLINK_BER_THRESHOLD:
                         totalTime += 1
 
-            percentConnected = totalTime / (24*60)
+            percentConnected = totalTime / (24*60) * 100
             #print("\tConnected Time:", totalTime, "seconds")
             #print("\tConnected Time:", percentConnected*100, "%")
             uplink_time_connected_inner.append(percentConnected)
@@ -518,6 +516,7 @@ def uplink_threaded(network_json, uplinkDataRate, downlinkDataRate, sat_rx_freq,
             #plt.show()
 
         uplink_time_connected.append(uplink_time_connected_inner)
+    #root.Save()
     return gain_list, uplink_time_connected, costs
 
 
@@ -528,9 +527,9 @@ if __name__ == '__main__':
     network_json = "awsNetwork/aws.json"
     network_json = "atlasNetwork/atlas.json"
 
-    sat_tx_freq = 2120
+    sat_tx_freq = 8200#2120 MHz
     uplinkDataRate = 0.125 # Mbps
-    downlinkDataRate = 16 # Mbps
+    downlinkDataRate = 64 # Mbps
 
     GAINS = linspace(0, 30, 31)
     POWERS = linspace(-200, -100, 21) # sensitivity
@@ -538,7 +537,7 @@ if __name__ == '__main__':
 
     p = []
 
-    num_workers = 1
+    num_workers = 11
 
     if num_workers > len(GAINS):
         raise ValueError("Number of workers must be less than or equal to the number of gains.")
@@ -565,18 +564,18 @@ if __name__ == '__main__':
     plt.close()
 
     plt.figure(3)
-    plt.title("S-Band Atlas Connection Time")
+    plt.title("X-Band Atlas Connection Time " + str(downlinkDataRate) + "Mbps")
     plt.ylabel("Gain (dB)")
     plt.xlabel("Sensitivity (dBW)")
     plt.ylim(GAINS[0], GAINS[-1])
     plt.xlim(POWERS[0], POWERS[-1])
     plt.yticks(GAINS[::2], fontsize = 7)
     plt.xticks(POWERS[::2], fontsize = 7)
-    plt.imshow(time_connected, cmap='viridis_r', interpolation='nearest', origin='upper', vmin=0, vmax=1, extent=[POWERS[0], POWERS[-1], GAINS[0], GAINS[-1]])
+    plt.imshow(time_connected, cmap='viridis_r', interpolation='nearest', origin='upper', vmin=0, vmax=100, extent=[POWERS[0], POWERS[-1], GAINS[0], GAINS[-1]])
     cbar = plt.colorbar()
     cbar.set_label("Uplink Time Connected (%)")
     plt.gcf().set_size_inches(9, 6)
-    plt.gcf().savefig('/'.join(network_json.split("/")[:-1]) + "/s_band_uplink_sens_gain.pdf")
+    plt.gcf().savefig('/'.join(network_json.split("/")[:-1]) + "/x_band_downlink_power_gain_" + str(downlinkDataRate) + "Mbps.pdf")
     plt.show()
 
 
